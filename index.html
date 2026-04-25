@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Python Data Science Workshop · AI Tutor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --paper: #faf7f2;
+    --paper-2: #f3ede4;
+    --accent: #b8431a;
+    --accent-soft: #f4e4d8;
+    --rule: #d8cfc1;
+    --muted: #6b6358;
+    --user-bg: #1a1a1a;
+    --user-fg: #faf7f2;
+    --bot-bg: #ffffff;
+    --bot-fg: #1a1a1a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* ============ LOGIN SCREEN ============ */
+  .login-screen {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background:
+      radial-gradient(ellipse at top left, var(--accent-soft) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, #e8e0d3 0%, transparent 60%),
+      var(--paper);
+  }
+  .login-card {
+    max-width: 480px;
+    width: 100%;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    padding: 3rem 2.5rem;
+    position: relative;
+  }
+  .login-card::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: -1px; right: -1px;
+    height: 4px;
+    background: var(--accent);
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  .login-card h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 2.1rem;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.6rem;
+  }
+  .login-card h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .login-card p.subtitle {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+  }
+  .field { margin-bottom: 1.25rem; }
+  .field label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  .field input {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    transition: border-color 0.15s;
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .btn-primary {
+    width: 100%;
+    padding: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: var(--accent); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .login-footer {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .login-footer strong { color: var(--ink); }
+  .err {
+    color: #c0392b;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    min-height: 1.2em;
+  }
+
+  /* ============ CHAT SCREEN ============ */
+  .chat-screen {
+    display: none;
+    flex-direction: column;
+    height: 100vh;
+  }
+  .chat-screen.active { display: flex; }
+
+  .chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+    flex-shrink: 0;
+  }
+  .header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+  }
+  .header-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.1rem;
+    letter-spacing: -0.01em;
+  }
+  .header-title em { color: var(--accent); font-style: italic; }
+  .header-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .btn-end {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-end:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem 1.5rem;
+    background: var(--paper-2);
+  }
+  .messages-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .welcome {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--muted);
+  }
+  .welcome h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+  }
+  .welcome p { font-size: 0.95rem; line-height: 1.5; }
+
+  .msg {
+    display: flex;
+    flex-direction: column;
+    max-width: 85%;
+    animation: fadeIn 0.3s ease-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .msg.user { align-self: flex-end; align-items: flex-end; }
+  .msg.assistant { align-self: flex-start; align-items: flex-start; }
+  .msg-role {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.35rem;
+    padding: 0 0.25rem;
+  }
+  .msg-bubble {
+    padding: 0.9rem 1.15rem;
+    line-height: 1.55;
+    font-size: 0.95rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .msg.user .msg-bubble {
+    background: var(--user-bg);
+    color: var(--user-fg);
+    border-radius: 14px 14px 2px 14px;
+  }
+  .msg.assistant .msg-bubble {
+    background: var(--bot-bg);
+    color: var(--bot-fg);
+    border-radius: 14px 14px 14px 2px;
+    border: 1px solid var(--rule);
+  }
+  .msg-bubble code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(0,0,0,0.06);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    font-size: 0.88em;
+  }
+  .msg.user .msg-bubble code { background: rgba(255,255,255,0.15); }
+  .msg-bubble pre {
+    background: #1a1a1a;
+    color: #f0e7d8;
+    padding: 0.9rem 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 0.6rem 0;
+    font-size: 0.85rem;
+  }
+  .msg-bubble pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .typing {
+    display: inline-flex;
+    gap: 4px;
+    padding: 0.9rem 1.15rem;
+    background: var(--bot-bg);
+    border: 1px solid var(--rule);
+    border-radius: 14px 14px 14px 2px;
+  }
+  .typing span {
+    width: 7px; height: 7px;
+    background: var(--muted);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.16s; }
+  .typing span:nth-child(3) { animation-delay: 0.32s; }
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  .composer {
+    background: var(--paper);
+    border-top: 1px solid var(--rule);
+    padding: 1rem 1.5rem;
+    flex-shrink: 0;
+  }
+  .composer-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+  }
+  .composer textarea {
+    flex: 1;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--rule);
+    background: var(--paper-2);
+    resize: none;
+    min-height: 48px;
+    max-height: 180px;
+    color: var(--ink);
+    transition: border-color 0.15s;
+  }
+  .composer textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .btn-send {
+    padding: 0 1.5rem;
+    height: 48px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .btn-send:hover:not(:disabled) { background: var(--accent); }
+  .btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .composer-hint {
+    max-width: 760px;
+    margin: 0.5rem auto 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 640px) {
+    .chat-header { padding: 0.75rem 1rem; flex-wrap: wrap; gap: 0.5rem; }
+    .header-left { gap: 0.5rem; flex-direction: column; align-items: flex-start; }
+    .header-meta { font-size: 0.7rem; }
+    .messages { padding: 1rem 0.75rem; }
+    .composer { padding: 0.75rem 1rem; }
+    .msg { max-width: 95%; }
+    .login-card { padding: 2rem 1.5rem; }
+    .login-card h1 { font-size: 1.7rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="eyebrow">Workshop · UIUC × Kolkata</div>
+    <h1>Python Data Science <em>AI Tutor</em></h1>
+    <p class="subtitle">Enter your Student ID to begin. Your conversations are recorded as part of the research study you consented to.</p>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="studentId">Student ID</label>
+        <input type="text" id="studentId" name="studentId" autocomplete="off" autocapitalize="off" autocorrect="off" required pattern="[A-Za-z0-9_-]{3,32}" placeholder="e.g. STU-0421" />
+      </div>
+      <button type="submit" class="btn-primary" id="loginBtn">Begin Session</button>
+      <div class="err" id="loginErr"></div>
+    </form>
+
+    <div class="login-footer">
+      <strong>About this study.</strong> "The Solitary Learner?" is an IRB-approved research project at the University of Illinois Urbana-Champaign. All chats are logged for analysis. Please do not share personal information beyond your assigned Student ID.
+    </div>
+  </div>
+</div>
+
+<!-- ============ CHAT ============ -->
+<div class="chat-screen" id="chatScreen">
+  <header class="chat-header">
+    <div class="header-left">
+      <div class="header-title">Python <em>Tutor</em></div>
+      <div class="header-meta" id="sessionMeta"></div>
+    </div>
+    <button class="btn-end" id="endBtn">End Session</button>
+  </header>
+
+  <main class="messages" id="messages">
+    <div class="messages-inner" id="messagesInner">
+      <div class="welcome">
+        <h2>Hello — ready when you are.</h2>
+        <p>Ask anything about Python, data analysis, or the workshop exercises.<br>I remember up to the last 50 messages of our conversation.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="composer">
+    <div class="composer-inner">
+      <textarea id="input" placeholder="Type your question…" rows="1"></textarea>
+      <button class="btn-send" id="sendBtn">Send</button>
+    </div>
+    <div class="composer-hint">↵ Enter to send · Shift+↵ for newline</div>
+  </footer>
+</div>
+
+<script>
+  // -------- State --------
+  let studentId = null;
+  let sessionId = null;
+  let messageCount = 0;
+
+  function generateSessionId() {
+    const ts = Date.now().toString(36);
+    const rand = Math.random().toString(36).slice(2, 10);
+    return `${ts}-${rand}`;
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    })[c]);
+  }
+
+  // Light markdown rendering: code blocks, inline code, bold, line breaks
+  function renderMarkdown(text) {
+    let html = escapeHtml(text);
+    // Triple backtick code blocks
+    html = html.replace(/```(\w+)?\n?([\s\S]*?)```/g, (_, lang, code) => {
+      return `<pre><code>${code.replace(/\n$/, '')}</code></pre>`;
+    });
+    // Inline code
+    html = html.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+    // Bold
+    html = html.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+    return html;
+  }
+
+  // -------- Login --------
+  const loginForm = document.getElementById('loginForm');
+  const loginBtn = document.getElementById('loginBtn');
+  const loginErr = document.getElementById('loginErr');
+  const loginScreen = document.getElementById('loginScreen');
+  const chatScreen = document.getElementById('chatScreen');
+
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = document.getElementById('studentId').value.trim();
+    if (!/^[A-Za-z0-9_-]{3,32}$/.test(id)) {
+      loginErr.textContent = 'ID must be 3-32 letters, numbers, hyphens, or underscores.';
+      return;
+    }
+    studentId = id;
+    sessionId = generateSessionId();
+
+    // Persist for refresh resilience (same-day continuity)
+    sessionStorage.setItem('sl_studentId', studentId);
+    sessionStorage.setItem('sl_sessionId', sessionId);
+
+    loginScreen.style.display = 'none';
+    chatScreen.classList.add('active');
+    document.getElementById('sessionMeta').textContent = `${studentId} · ${sessionId.slice(0, 8)}`;
+    document.getElementById('input').focus();
+  });
+
+  // Restore session if exists
+  const savedStudent = sessionStorage.getItem('sl_studentId');
+  const savedSession = sessionStorage.getItem('sl_sessionId');
+  if (savedStudent && savedSession) {
+    studentId = savedStudent;
+    sessionId = savedSession;
+    loginScreen.style.display = 'none';
+    chatScreen.classList.add('active');
+    document.getElementById('sessionMeta').textContent = `${studentId} · ${sessionId.slice(0, 8)}`;
+  }
+
+  // -------- End session --------
+  document.getElementById('endBtn').addEventListener('click', () => {
+    if (!confirm('End this session? You can start a new one anytime.')) return;
+    sessionStorage.removeItem('sl_studentId');
+    sessionStorage.removeItem('sl_sessionId');
+    location.reload();
+  });
+
+  // -------- Chat --------
+  const input = document.getElementById('input');
+  const sendBtn = document.getElementById('sendBtn');
+  const messagesInner = document.getElementById('messagesInner');
+  const messagesEl = document.getElementById('messages');
+
+  function autoResize() {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 180) + 'px';
+  }
+  input.addEventListener('input', autoResize);
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  });
+  sendBtn.addEventListener('click', send);
+
+  function addMessage(role, content) {
+    // Remove welcome message on first real message
+    if (messageCount === 0) {
+      const welcome = document.querySelector('.welcome');
+      if (welcome) welcome.remove();
+    }
+    const wrap = document.createElement('div');
+    wrap.className = `msg ${role}`;
+    const label = role === 'user' ? 'You' : 'Tutor';
+    wrap.innerHTML = `
+      <div class="msg-role">${label}</div>
+      <div class="msg-bubble">${renderMarkdown(content)}</div>
+    `;
+    messagesInner.appendChild(wrap);
+    messageCount++;
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function showTyping() {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg assistant';
+    wrap.id = 'typingIndicator';
+    wrap.innerHTML = `
+      <div class="msg-role">Tutor</div>
+      <div class="typing"><span></span><span></span><span></span></div>
+    `;
+    messagesInner.appendChild(wrap);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function hideTyping() {
+    const t = document.getElementById('typingIndicator');
+    if (t) t.remove();
+  }
+
+  async function send() {
+    const text = input.value.trim();
+    if (!text || sendBtn.disabled) return;
+    if (!studentId || !sessionId) {
+      alert('Session expired. Please log in again.');
+      location.reload();
+      return;
+    }
+
+    addMessage('user', text);
+    input.value = '';
+    autoResize();
+    sendBtn.disabled = true;
+    showTyping();
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentId, sessionId, message: text }),
+      });
+      hideTyping();
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        addMessage('assistant', `⚠️ ${err.error || 'Something went wrong. Please try again.'}`);
+      } else {
+        const data = await res.json();
+        addMessage('assistant', data.reply || '(no response)');
+      }
+    } catch (e) {
+      hideTyping();
+      addMessage('assistant', '⚠️ Network error. Please check your connection and try again.');
+    } finally {
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  }
+</script>
+
+</body>
+</html>

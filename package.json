@@ -1,0 +1,17 @@
+{
+  "name": "solitary-learner-chat",
+  "version": "1.0.0",
+  "description": "Chat interface for The Solitary Learner? RCT — Sharanya Bhattacharya, UIUC",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@vercel/postgres": "^0.10.0",
+    "openai": "^4.77.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
