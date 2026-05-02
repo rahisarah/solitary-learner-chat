@@ -14,10 +14,10 @@ import crypto from 'crypto';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const MODEL = 'gpt-5.4-mini';
-const SUMMARIZER_MODEL = 'gpt-5.4-nano'; // cheaper model for summarization
+const SUMMARIZER_MODEL = 'gpt-5.4-mini'; // cheaper model for summarization
 const MEMORY_THRESHOLD = 50;  // start compressing once total messages exceed this
-const KEEP_RECENT = 20;       // how many most-recent messages to keep verbatim after compressing
-const MAX_MESSAGE_LENGTH = 4000;
+const KEEP_RECENT = 30;       // how many most-recent messages to keep verbatim after compressing
+const MAX_MESSAGE_LENGTH = 5000;
 
 const SYSTEM_PROMPT = `You are a helpful Python and data science tutor assisting undergraduate students in a 2-day Python data science workshop in Kolkata, India. Help them understand concepts, debug code, and work through exercises. Be encouraging, clear, and pedagogical. When students ask about concepts, explain them step by step. When they share code, help them think through what's wrong rather than just giving answers when possible.`;
 
